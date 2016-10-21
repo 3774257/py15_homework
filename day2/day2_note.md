@@ -4,10 +4,10 @@
 +   数据类型(字符串、数字、列表、字典、元组)
 
 ##循环之for
-   ####1、功能
+####1、功能
         python中循环大多数都是用for来完成,for循环是一种迭代循环机制不同于
         while循环,迭代即重复相同操作,每次操作都是给予上一次结果而进行的。
-   ####2、语法
+####2、语法
         name_list = ['zhangsan','lisi','wanger']
         for i in name_list:
             print(i)
