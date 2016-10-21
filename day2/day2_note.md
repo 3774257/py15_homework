@@ -644,4 +644,29 @@
 #####列表的生成
        name = ['zhangsan','lisi']
 #####列表的常用方法
-       未完待续晚上写。。。。
+       #增
+           names.append('laowang')
+           names.insert(1,'laowang2')#前面的数字是插入的索引值
+       #删
+           names.remove('laowang2')
+           del names[1]
+           names.pop(1)#默认删除最后一位，删除并打印出来
+       #改
+           names[1] = '老王'
+       #查
+           print(names[1:])
+       #反转==倒序
+           names.reverse()
+       #查询索引值
+           names.index('zhangsan')
+       #清楚列表内容
+           names.clear()
+       #合并，把两个列表合并成一个列表
+           names.extend()
+       拷贝,py3中已经没有深浅拷贝的区别了，删除源列表不会影响到复制后的列表
+           n2 = names.copy()
+           n3 = names
+           names.pop()
+           print('names:',names,id(names))
+           print('n2:',n2,id(n2))
+           print('n3:',n3,id(n3))
