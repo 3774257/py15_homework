@@ -99,251 +99,251 @@
     >>> print(type(name))
     <type 'str'>
 #####字符串的常用方法
-       1、capitalize(self) #首字母变大写
-              >>> name="hello,world."
-              >>> name.capitalize()
-              'Hellor,world.'
-       2、center(self, width, fillchar=None) 
-              #内容居中，width：字符串的总宽度；fillchar：填充字符，默认填充字符为空格
-              >>> string="hello word"
-              >>> string.center(20,"*")
-              *****hello word*****'
-       3、count(self, sub, start=None, end=None)
-              #用于统计字符串里某个字符出现的次数,可选参数为在字符串搜索的开始与结束位置。
-              '''
-                sub –> 搜索的子字符串
-                start –> 字符串开始搜索的位置。默认为第一个字符,第一个字符索引值为0。
-                end –> 字符串中结束搜索的位置。字符中第一个字符的索引为 0。默认为字符串的最后一个位置。
-              '''
-              >>> string = 'hello,world.'
-              >>> string.count('l')
-              3
-              >>> string.count('l',2,6)#指定范围2-6、顾头不顾尾
-              2
-       4、endswith(self, suffix, start=None, end=None)
-              #判断字符串是否以指定后缀结尾，如果以指定后缀结尾返回True，否则返回False
-              '''
-                suffix –> 后缀，可能是一个字符串，或者也可能是寻找后缀的tuple。
-                start –> 开始，切片从这里开始。
-                end –> 结束，片到此为止。
-              '''
-              >>> string.endswith('.')
-              True
-              >>> string.endswith('d')
-              False
-              >>> string.endswith('d',-1)
-              False
-              >>> string.endswith('d',0,-1)#指定范围
-              True
-       5、expandtabs(self, tabsize=None)
-              #把字符串中的tab符号(‘\t’)转为空格，tab符号(‘\t’)默认的空格数是8。
-              #tabsize –> 指定转换字符串中的 tab 符号(‘\t’)转为空格的字符数。
-              >>> string = 'hello\tworld.'
-              >>> string
-              'hello\tworld.'
-              >>> string.expandtabs(20)
-              'hello               world.'
-       6、find(self, sub, start=None, end=None)
-              #查找关键字，如果指定beg(开始)和end(结束)范围，则检查是否包含在指定范围内，如果包含子字符串返回开始的索引值，否则返回-1
-              '''
-                str –> 指定检索的字符串
-                beg –> 开始索引，默认为0。
-                end –> 结束索引，默认为字符串的长度。
-              '''
-              >>> string.find('l')
-              2
-              >>> string.find('l',3)
-              3
-              >>> string.find('l',4)
-              9
-              >>> string
-              'hello\tworld.'
-       7、index(self, sub, start=None, end=None)
-              #检查字符的索引值、和find类似。找不到就报错、而find找不到则返回-1
-              '''
-                str –> 指定检索的字符串
-                beg –> 开始索引，默认为0。
-                end –> 结束索引，默认为字符串的长度。
-              '''
-              >>> string.index('l')
-              2
-              >>> string.index('l',3)
-              3
-              >>> string.index('l',4)
-              9
-              >>> string.index('a')
-              Traceback (most recent call last):
-              File "<stdin>", line 1, in <module>
-              ValueError: substring not found
-       8、isalnum(self)
-              #检测字符串是否由字母和数字组成或者纯字母纯数字，返回True,否则返回False
-              >>> string = 'fdsfds'
-              >>> string.isalnum()
-              True
-              >>> string = 'fdsfdsfsfds123456'
-              >>> string.isalnum()
-              True
-              >>> string = 'fdsfdsfsfds 123456'
-              >>> string.isalnum()
-              False
-       9、isalpha(self)
-              #检测字符串是否只有字母组成
-              >>> string = 'fdsfds'
-              >>> string.isalpha()
-              True
-              >>> string = 'fdsfds '
-              >>> string.isalpha()
-              False
-              >>> string = 'fdsfds123432'
-              >>> string.isalpha()
-              False
-              >>> string = '12432'
-              >>> string.isalpha()
-              False
-       10、isdigit(self)
-              #只能是数字
-       11、islower(self)
-              #检测字符串元素是否为小写字母
-              >>> str = 'abc'
-              >>> str.islower()
-              True
-              >>> str = '123'
-              >>> str.islower()
-              False
-              >>> str = 'abc123'
-              >>> str.islower()
-              True
-              >>> str = 'abc123B'
-              >>> str.islower()
-              False
-       12、isspace(self)
-              #是否有空格组成
-              >>> str = 'fdsa fdsa'
-              >>> str.isspace()
-              False
-              >>> str = ' '
-              >>> str.isspace()
-              True
-              >>> str = '\t'
-              >>> str.isspace()
-              True
-              >>> str = '\n'
-              >>> str.isspace()
-              True
-       13、istitle(self)
-              #检测字符串中所有的单词拼写首字母是否为大写，且其他字母为小写
-              >>> str = 'abc Wd'
-              >>> str.istitle()
-              False
-              >>> str = 'Abc Wd'
-              >>> str.istitle()
-              True
-              >>> str = 'Abc d'
-              >>> str.istitle()
-              False
-       14、isupper(self)
-              #检测字符串中所有的字母是否都为大写。
-              >>> str = 'ABC'
-              >>> str.isupper()
-              True
-              >>> str = 'ABCd'
-              >>> str.isupper()
-              False
-              >>> str = 'ABC123'
-              >>> str.isupper()
-              True
-       15、ljust(self, width, fillchar=None)
-              #返回一个原字符串左对齐,并使用空格填充至指定长度的新字符串。如果指定的长度小于原字符串的长度则返回原字符串。
-              '''
-                width –> 指定字符串长度
-                fillchar –> 填充字符，默认为空格
-              '''
-              >>> str = 'hello'
-              >>> str.ljust(10)
-              'hello     '
-              >>> str.ljust(10,'*')
-              'hello*****'
-       16、lower(self)
-              #转换字符串中所有大写字符为小写
-              >>> str = 'HeLlo'
-              >>> str.lower()
-              'hello'
-       17、upper(self)
-              #转换字符串中所有小写为大写
-              >>> str =  'abc'
-              >>> str.upper()
-              'ABC'
-       18、lstrip(self, chars=None)
-              #截掉字符串左边的空格或指定字符
-              #chars –> 指定截取的字符
-              >>> str = '  fds   '
-              >>> str.lstrip()
-              'fds   '
-              >>> str = '.fds.'
-              >>> str.lstrip('.')
-              'fds.'
-       19、rstrip(self,chars=None)
-              #截取右边的空格和指定字符
-              用法和lstrip一样
-       20、strip(self,chars=None)
-              #截取左边和右边的空格和指定字符
-              
-       21、split(self,str)
-              #用来根据指定的分隔符将字符串进行分割，
-              #如果字符串包含指定的分隔符，则返回结果的列表，
-              >>> str = 'a.b.c'
-              >>> str.split('.')
-              ['a', 'b', 'c']
-       22、replace(self, old, new, count=None)
-              #把字符串中的 old(旧字符串)替换成new(新字符串)，
-              #如果指定第三个参数max，则替换不超过max次
-              >>> str = 'aabbcc'
-              >>> str.replace('a','d')
-              'ddbbcc'
-              >>> str = 'aabbcc'
-              >>> str.replace('a','d',1)
-              'dabbcc'
+    1、capitalize(self) #首字母变大写
+          >>> name="hello,world."
+          >>> name.capitalize()
+          'Hellor,world.'
+    2、center(self, width, fillchar=None) 
+          #内容居中，width：字符串的总宽度；fillchar：填充字符，默认填充字符为空格
+          >>> string="hello word"
+          >>> string.center(20,"*")
+          *****hello word*****'
+    3、count(self, sub, start=None, end=None)
+          #用于统计字符串里某个字符出现的次数,可选参数为在字符串搜索的开始与结束位置。
+          '''
+            sub –> 搜索的子字符串
+            start –> 字符串开始搜索的位置。默认为第一个字符,第一个字符索引值为0。
+            end –> 字符串中结束搜索的位置。字符中第一个字符的索引为 0。默认为字符串的最后一个位置。
+          '''
+          >>> string = 'hello,world.'
+          >>> string.count('l')
+          3
+          >>> string.count('l',2,6)#指定范围2-6、顾头不顾尾
+          2
+    4、endswith(self, suffix, start=None, end=None)
+          #判断字符串是否以指定后缀结尾，如果以指定后缀结尾返回True，否则返回False
+          '''
+            suffix –> 后缀，可能是一个字符串，或者也可能是寻找后缀的tuple。
+            start –> 开始，切片从这里开始。
+            end –> 结束，片到此为止。
+          '''
+          >>> string.endswith('.')
+          True
+          >>> string.endswith('d')
+          False
+          >>> string.endswith('d',-1)
+          False
+          >>> string.endswith('d',0,-1)#指定范围
+          True
+    5、expandtabs(self, tabsize=None)
+          #把字符串中的tab符号(‘\t’)转为空格，tab符号(‘\t’)默认的空格数是8。
+          #tabsize –> 指定转换字符串中的 tab 符号(‘\t’)转为空格的字符数。
+          >>> string = 'hello\tworld.'
+          >>> string
+          'hello\tworld.'
+          >>> string.expandtabs(20)
+          'hello               world.'
+    6、find(self, sub, start=None, end=None)
+          #查找关键字，如果指定beg(开始)和end(结束)范围，则检查是否包含在指定范围内，如果包含子字符串返回开始的索引值，否则返回-1
+          '''
+            str –> 指定检索的字符串
+            beg –> 开始索引，默认为0。
+            end –> 结束索引，默认为字符串的长度。
+          '''
+          >>> string.find('l')
+          2
+          >>> string.find('l',3)
+          3
+          >>> string.find('l',4)
+          9
+          >>> string
+          'hello\tworld.'
+    7、index(self, sub, start=None, end=None)
+          #检查字符的索引值、和find类似。找不到就报错、而find找不到则返回-1
+          '''
+            str –> 指定检索的字符串
+            beg –> 开始索引，默认为0。
+            end –> 结束索引，默认为字符串的长度。
+          '''
+          >>> string.index('l')
+          2
+          >>> string.index('l',3)
+          3
+          >>> string.index('l',4)
+          9
+          >>> string.index('a')
+          Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+          ValueError: substring not found
+    8、isalnum(self)
+          #检测字符串是否由字母和数字组成或者纯字母纯数字，返回True,否则返回False
+          >>> string = 'fdsfds'
+          >>> string.isalnum()
+          True
+          >>> string = 'fdsfdsfsfds123456'
+          >>> string.isalnum()
+          True
+          >>> string = 'fdsfdsfsfds 123456'
+          >>> string.isalnum()
+          False
+    9、isalpha(self)
+          #检测字符串是否只有字母组成
+          >>> string = 'fdsfds'
+          >>> string.isalpha()
+          True
+          >>> string = 'fdsfds '
+          >>> string.isalpha()
+          False
+          >>> string = 'fdsfds123432'
+          >>> string.isalpha()
+          False
+          >>> string = '12432'
+          >>> string.isalpha()
+          False
+    10、isdigit(self)
+          #只能是数字
+    11、islower(self)
+          #检测字符串元素是否为小写字母
+          >>> str = 'abc'
+          >>> str.islower()
+          True
+          >>> str = '123'
+          >>> str.islower()
+          False
+          >>> str = 'abc123'
+          >>> str.islower()
+          True
+          >>> str = 'abc123B'
+          >>> str.islower()
+          False
+    12、isspace(self)
+          #是否有空格组成
+          >>> str = 'fdsa fdsa'
+          >>> str.isspace()
+          False
+          >>> str = ' '
+          >>> str.isspace()
+          True
+          >>> str = '\t'
+          >>> str.isspace()
+          True
+          >>> str = '\n'
+          >>> str.isspace()
+          True
+    13、istitle(self)
+          #检测字符串中所有的单词拼写首字母是否为大写，且其他字母为小写
+          >>> str = 'abc Wd'
+          >>> str.istitle()
+          False
+          >>> str = 'Abc Wd'
+          >>> str.istitle()
+          True
+          >>> str = 'Abc d'
+          >>> str.istitle()
+          False
+    14、isupper(self)
+          #检测字符串中所有的字母是否都为大写。
+          >>> str = 'ABC'
+          >>> str.isupper()
+          True
+          >>> str = 'ABCd'
+          >>> str.isupper()
+          False
+          >>> str = 'ABC123'
+          >>> str.isupper()
+          True
+    15、ljust(self, width, fillchar=None)
+          #返回一个原字符串左对齐,并使用空格填充至指定长度的新字符串。如果指定的长度小于原字符串的长度则返回原字符串。
+          '''
+            width –> 指定字符串长度
+            fillchar –> 填充字符，默认为空格
+          '''
+          >>> str = 'hello'
+          >>> str.ljust(10)
+          'hello     '
+          >>> str.ljust(10,'*')
+          'hello*****'
+    16、lower(self)
+          #转换字符串中所有大写字符为小写
+          >>> str = 'HeLlo'
+          >>> str.lower()
+          'hello'
+    17、upper(self)
+          #转换字符串中所有小写为大写
+          >>> str =  'abc'
+          >>> str.upper()
+          'ABC'
+    18、lstrip(self, chars=None)
+          #截掉字符串左边的空格或指定字符
+          #chars –> 指定截取的字符
+          >>> str = '  fds   '
+          >>> str.lstrip()
+          'fds   '
+          >>> str = '.fds.'
+          >>> str.lstrip('.')
+          'fds.'
+    19、rstrip(self,chars=None)
+          #截取右边的空格和指定字符
+          用法和lstrip一样
+    20、strip(self,chars=None)
+          #截取左边和右边的空格和指定字符
+          
+    21、split(self,str)
+          #用来根据指定的分隔符将字符串进行分割，
+          #如果字符串包含指定的分隔符，则返回结果的列表，
+          >>> str = 'a.b.c'
+          >>> str.split('.')
+          ['a', 'b', 'c']
+    22、replace(self, old, new, count=None)
+          #把字符串中的 old(旧字符串)替换成new(新字符串)，
+          #如果指定第三个参数max，则替换不超过max次
+          >>> str = 'aabbcc'
+          >>> str.replace('a','d')
+          'ddbbcc'
+          >>> str = 'aabbcc'
+          >>> str.replace('a','d',1)
+          'dabbcc'
 #####python中str函数isdigit、isdecimal、isnumeric的区别
-              num = "1"  #unicode
-              num.isdigit()   # True
-              num.isdecimal() # True
-              num.isnumeric() # True
+      num = "1"  #unicode
+      num.isdigit()   # True
+      num.isdecimal() # True
+      num.isnumeric() # True
 
-              num = "1" # 全角
-              num.isdigit()   # True
-              num.isdecimal() # True
-              num.isnumeric() # True
+      num = "1" # 全角
+      num.isdigit()   # True
+      num.isdecimal() # True
+      num.isnumeric() # True
 
-              num = b"1" # byte
-              num.isdigit()   # True
-              num.isdecimal() # AttributeError 'bytes' object has no attribute 'isdecimal'
-              num.isnumeric() # AttributeError 'bytes' object has no attribute 'isnumeric'
+      num = b"1" # byte
+      num.isdigit()   # True
+      num.isdecimal() # AttributeError 'bytes' object has no attribute 'isdecimal'
+      num.isnumeric() # AttributeError 'bytes' object has no attribute 'isnumeric'
 
-              num = "IV" # 罗马数字
-              num.isdigit()   # True
-              num.isdecimal() # False
-              num.isnumeric() # True
+      num = "IV" # 罗马数字
+      num.isdigit()   # True
+      num.isdecimal() # False
+      num.isnumeric() # True
 
-              num = "四" # 汉字
-              num.isdigit()   # False
-              num.isdecimal() # False
-              num.isnumeric() # True
+      num = "四" # 汉字
+      num.isdigit()   # False
+      num.isdecimal() # False
+      num.isnumeric() # True
 
-              ===================
-              isdigit()
-              True: Unicode数字，byte数字（单字节），全角数字（双字节），罗马数字
-              False: 汉字数字
-              Error: 无
+      ===================
+      isdigit()
+      True: Unicode数字，byte数字（单字节），全角数字（双字节），罗马数字
+      False: 汉字数字
+      Error: 无
 
-              isdecimal()
-              True: Unicode数字，，全角数字（双字节）
-              False: 罗马数字，汉字数字
-              Error: byte数字（单字节）
+      isdecimal()
+      True: Unicode数字，，全角数字（双字节）
+      False: 罗马数字，汉字数字
+      Error: byte数字（单字节）
 
-              isnumeric()
-              True: Unicode数字，全角数字（双字节），罗马数字，汉字数字
-              False: 无
-              Error: byte数字（单字节）
+      isnumeric()
+      True: Unicode数字，全角数字（双字节），罗马数字，汉字数字
+      False: 无
+      Error: byte数字（单字节）
 ####运算符
 #####什么是运算符?
     举个简单的例子 4 +5 = 9 。 例子中，4 和 5 被称为操作数，"+" 称为运算符。
