@@ -87,3 +87,173 @@
             {'name': 'zhangsan', 'age': 18}
             >>> dict1.values()
             dict_values(['zhangsan', 18])
+            
+###2、集合
+    集合（set）是一个无序不重复元素的序列。
+    基本功能是进行成员关系测试和删除重复元素
+####2.1、集合创建
+    可以使用大括号({})或者 set()函数创建集合，注意：创建一个空集合必须用 set() 而不是 { }，因为 { } 是用来创建一个空字典。
+    演示:
+        >>> user_set = set()
+        >>> type(user_set)
+        <class 'set'>
+        >>> user_set = ({})#创建空集合最好用set()
+        >>> type(user_set)
+        <class 'dict'>
+        >>> 
+####2.2、集合常用方法
+    #!/usr/bin/python3
+    student = {'Tom', 'Jim', 'Mary', 'Tom', 'Jack', 'Rose'}
+    print(student)   # 输出集合，重复的元素被自动去掉
+    # 成员测试
+    if('Rose' in student) :
+        print('Rose 在集合中')
+    else :
+        print('Rose 不在集合中')
+    
+    # set可以进行集合运算
+    a = set('abracadabra')
+    b = set('alacazam')
+    print(a)
+    print(b)
+    print(a - b)     # a和b的差集
+    print(a | b)     # a和b的并集
+    print(a & b)     # a和b的交集
+    print(a ^ b)     # a和b中不同时存在的元素
+    结果如下:
+    {'Jack', 'Rose', 'Mary', 'Jim', 'Tom'}
+    Rose 在集合中
+    {'r', 'b', 'a', 'c', 'd'}
+    {'m', 'z', 'c', 'a', 'l'}
+    {'r', 'b', 'd'}
+    {'a', 'l', 'z', 'b', 'm', 'd', 'r', 'c'}
+    {'a', 'c'}
+    {'l', 'z', 'b', 'm', 'd', 'r'}
+###3、文件处理
+    Python可以对文件内容进行添加、修改、删除，
+    使用到的函数在Python3.5.x为open，在Python2.7.x同时支持file和open。
+####3.1、Python文件打开方式
+    文件句柄 = open('文件路径','打开模式')
+    文件句柄就像变量名一样,打开模式默认为只读
+####3.2、Python打开文件的模式
+    模式	    描述
+    r	    以只读方式打开文件。文件的指针将会放在文件的开头。这是默认模式。
+    rb	    以二进制格式打开一个文件用于只读。文件指针将会放在文件的开头。这是默认模式。
+    r+	    打开一个文件用于读写。文件指针将会放在文件的开头。
+    rb+	    以二进制格式打开一个文件用于读写。文件指针将会放在文件的开头。
+    w	    打开一个文件只用于写入。如果该文件已存在则将其覆盖。如果该文件不存在，创建新文件。
+    wb	    以二进制格式打开一个文件只用于写入。如果该文件已存在则将其覆盖。如果该文件不存在，创建新文件。
+    w+	    打开一个文件用于读写。如果该文件已存在则将其覆盖。如果该文件不存在，创建新文件。
+    wb+	    以二进制格式打开一个文件用于读写。如果该文件已存在则将其覆盖。如果该文件不存在，创建新文件。
+    a	    打开一个文件用于追加。如果该文件已存在，文件指针将会放在文件的结尾。也就是说，新的内容将会被写入到已有内容之后。如果该文件不存在，创建新文件进行写入。
+    ab	    以二进制格式打开一个文件用于追加。如果该文件已存在，文件指针将会放在文件的结尾。也就是说，新的内容将会被写入到已有内容之后。如果该文件不存在，创建新文件进行写入。
+    a+	    打开一个文件用于读写。如果该文件已存在，文件指针将会放在文件的结尾。文件打开时会是追加模式。如果该文件不存在，创建新文件用于读写。
+    ab+	    以二进制格式打开一个文件用于追加。如果该文件已存在，文件指针将会放在文件的结尾。如果该文件不存在，创建新文件用于读写。
+####3.3、Python文件读取方式
+    
+    模式	                说明
+    read([size])	    读取文件全部内容，如果设置了size，那么久读取size字节
+    readline([size])	    一行一行的读取
+    readlines()	    读取到的每一行内容作为列表中的一个元素
+    ps:python3中可以直接循环文件句柄
+    演示:
+        测试文件为:file.txt
+        jijianmingdeMacBook-Pro:~ jijianming$ cat file.txt 
+        1
+        2
+        3
+        4
+        5
+        6
+    python3:直接循环句柄
+        >>> f = open('file.txt')
+        >>> for i in f:
+        ...     print(i)
+        ... 
+        1
+        
+        2
+        
+        3
+        
+        4
+        
+        5
+        
+        6
+    read:
+        # 以只读的方式打开文件file.txt
+        f = open("file.txt","r")
+        # 读取文件内容赋值给变量c
+        c = f.read()
+        # 关闭文件
+        f.close()
+        # 输出c的值
+        print(c)
+        1
+        2
+        3
+        4
+        5
+        6
+    readlines:
+        >>> f = open('file.txt')
+        >>> c = f.readlines()
+        >>> print(c)
+        ['1\n', '2\n', '3\n', '4\n', '5\n', '6\n']
+    readline:
+        >>> f = open('file.txt')
+        >>> c = f.readline()
+        >>> print(c)
+        1
+        >>> c = f.readline()
+        >>> print(c)
+        2
+        >>> c = f.readline()
+        >>> print(c)
+        3
+####3.4、Python文件写入方式   
+    方法	                            说明
+    write(str)	                将字符串写入文件
+    writelines(sequence or strings)	写多行到文件，参数可以是一个可迭代的对象，列表、元组等
+    演示:
+        >>> f = open('file.txt','w')
+        >>> f.write('abc')
+        3
+        >>> f.close()
+        >>> f = open('file.txt','r')
+        >>> f.readlines()
+        ['abc']
+        >>> f = open('file.txt','w')
+        >>> f.write(['1','2','3','4','5'])
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        TypeError: write() argument must be str, not list
+        >>> f.close()
+        >>> f = open('file.txt','w')
+        >>> f.writelines(['1','2','3','4','5'])
+        >>> f.close()
+####3.5、Python文件操作默认的方法
+    方法                  说明
+    f.close           关闭已经打开的文件
+    f.flush           刷新缓冲区的内容到硬盘中
+    f.isatty          判断文件是否是tty设备，如果是tty设备则返回True，否则返回False
+    f.readable        文件是否可读，如果可读返回True，否则返回False
+    f.tell            获取指针位置
+    f.seek            指定文件中指针位置
+    f.writable        文件是否可写
+####3.6、同时打开多个文件
+    with open('file1') as f_read , open('file2','w') as f_write:
+    #是适用2.7以上版本
+###4、字符编码
+    首先要搞清楚，字符串在Python内部的表示是unicode编码，
+    因此，在做编码转换时，通常需要以unicode作为中间编码，
+    即先将其他编码的字符串解码（decode）成unicode，再从unicode编码（encode）成另一种编码。
+    decode的作用是将其他编码的字符串转换成unicode编码，如str1.decode('gb2312')，表示将gb2312编码的字符串转换成unicode编码。
+    encode的作用是将unicode编码转换成其他编码的字符串，如str2.encode('gb2312')，表示将unicode编码的字符串转换成gb2312编码。
+    GBK转换UTF-8格式流程
+        1、首先通过解码(decode)转换为unicode;
+        2、再通过编码( encode)转换成utf-8.
+    UTF-8转换成GBK格式流程和上面一样.
+    详细请浏览:
+        http://www.cnblogs.com/yuanchenqi/articles/5956943.html
