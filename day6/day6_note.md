@@ -68,19 +68,19 @@
     json.load(obj)	读取文件中的字符串，序列化成Python的基本数据类型
     json.dump(obj)	将Python的基本数据类型序列化成字符串并写入到文件中
     操作:
-        将字符串序列化成字典
+        #将字符串序列化成字典
         >>> dict_str = '{"name":"walker","age":22}'
-        注意字符串的引号,要双引号才行,单引号会报错
+        #注意字符串的引号,要双引号才行,单引号会报错
         >>> print(type(dict_str))
         <class 'str'>
         >>> dict_json = json.loads(dict_str)
         >>> print(type(dict_json))
         <class 'dict'>
         dump、load和dumps、loads使用方法一样,不过是保存在文件中
-##1.4、常用模块之time和datetime
+###1.4、常用模块之time和datetime
     方法名	                            说明
     time.sleep(int)	                等待时间
-    time.time()	                输出时间戳，从1970年1月1号到现在用了多少秒
+    time.time()	                    输出时间戳，从1970年1月1号到现在用了多少秒
     time.ctime()	                返回当前的系统时间
     time.gmtime()	                将时间戳转换成struct_time格式
     time.localtime()	                以struct_time格式返回本地时间
@@ -102,15 +102,15 @@
     print(time.asctime(time.localtime())) #返回时间格式"Fri Aug 19 11:14:16 2016",
     print(time.ctime())            #返回Fri Aug 19 12:38:29 2016 格式, 同上
     
-    日期字符串 转成  时间戳
+    #日期字符串 转成  时间戳
     string_2_struct = time.strptime("2016/05/22","%Y/%m/%d") #将 日期字符串 转成 struct时间对象格式
     print(string_2_struct)
     struct_2_stamp = time.mktime(string_2_struct) #将struct时间对象转成时间戳
     print(struct_2_stamp) 
-    将时间戳转为字符串格式
+    #将时间戳转为字符串格式
     print(time.gmtime(time.time()-86640)) #将utc时间戳转换成struct_time格式
     print(time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime()) ) #将utc struct_time格式转成指定的字符串格式
-    时间加减
+    #时间加减
     import datetime    
     print(datetime.datetime.now()) #返回 2016-08-19 12:47:03.941925
     print(datetime.date.fromtimestamp(time.time()) )  # 时间戳直接转成日期格式 2016-08-19
@@ -122,7 +122,7 @@
     c_time  = datetime.datetime.now()
     print(c_time.replace(minute=3,hour=2)) #时间替换
     操作:
-        取当前时间
+        #取当前时间
         >>> time.strftime('%Y-%m-%d %H:%M:%S')
         '2016-11-16 12:22:47'
 ##1.5、常用模块之
