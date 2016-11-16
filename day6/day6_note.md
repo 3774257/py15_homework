@@ -1,7 +1,7 @@
 ##今日内容
 +   常用模块
 +   re正则
-###1.1、常用模块之os模块
+##1.1、常用模块之os模块
     模块方法	                        说明
     os.getcwd()	                获取当前工作目录，即当前python脚本工作的目录路径
     os.chdir(“dirname”)	        改变当前脚本工作目录；相当于shell下cd
@@ -44,7 +44,7 @@
         os.path.exists(filename)
         #获取文件所在目录
         os.path.dirname(os.path.abspath(filename))
-###1.2、常用模块之sys
+##1.2、常用模块之sys
     模块方法	                解释说明
     sys.argv	            传递到Python脚本的命令行参数列表，第一个元素是程序本身路径
     sys.executable	    返回Python解释器在当前系统中的绝对路径
@@ -57,7 +57,7 @@
     操作:
         #获取传参
         sys.argv()
-###1.3、常用模块之json
+##1.3、常用模块之json
     序列化（Serialization）：将对象的状态信息转换为可以存储或可以通过网络传输的过程，传输的格式可以是JSON、XML等。
     反序列化就是从存储区域（JSON，XML）读取反序列化对象的状态，重新创建该对象。
     
@@ -76,7 +76,7 @@
         >>> print(type(dict_json))
         <class 'dict'>
         dump、load和dumps、loads使用方法一样,不过是保存在文件中
-###1.4、常用模块之time和datetime
+##1.4、常用模块之time和datetime
     方法名	                            说明
     time.sleep(int)	                等待时间
     time.time()	                输出时间戳，从1970年1月1号到现在用了多少秒
@@ -125,4 +125,4 @@
         #取当前时间
         >>> time.strftime('%Y-%m-%d %H:%M:%S')
         '2016-11-16 12:22:47'
-###1.5、常用模块之
+##1.5、常用模块之
