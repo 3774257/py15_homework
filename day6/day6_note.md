@@ -1,6 +1,7 @@
-##今日内容
+#今日内容
 +   常用模块
 +   re正则
+
 ##1.1、常用模块之os模块
     模块方法	                        说明
     os.getcwd()	                获取当前工作目录，即当前python脚本工作的目录路径
@@ -33,16 +34,16 @@
     os.path.getatime(path)	        返回path所指向的文件或者目录的最后存取时间
     os.path.getmtime(path)	        返回path所指向的文件或者目录的最后修改时间
     常用模块操作过程:
-        #获取当前路径:
+        获取当前路径:
         >>> os.getcwd()
         '/Users/jijianming'
-        #删除文件
+        删除文件
         os.remove(filename)
-        #该名
+        该名
         os.rename(oldname,newname)
-        #判断文件是否存在
+        判断文件是否存在
         os.path.exists(filename)
-        #获取文件所在目录
+        获取文件所在目录
         os.path.dirname(os.path.abspath(filename))
 ##1.2、常用模块之sys
     模块方法	                解释说明
@@ -67,9 +68,9 @@
     json.load(obj)	读取文件中的字符串，序列化成Python的基本数据类型
     json.dump(obj)	将Python的基本数据类型序列化成字符串并写入到文件中
     操作:
-        #将字符串序列化成字典
+        将字符串序列化成字典
         >>> dict_str = '{"name":"walker","age":22}'
-        #注意字符串的引号,要双引号才行,单引号会报错
+        注意字符串的引号,要双引号才行,单引号会报错
         >>> print(type(dict_str))
         <class 'str'>
         >>> dict_json = json.loads(dict_str)
@@ -92,37 +93,36 @@
     current_time.replace(2016,5,12)	返回当前时间,但指定的值将被替换
     datetime.datetime.strptime(“21/11/06 16:30”, “%d/%m/%y %H:%M”)	将字符串转换成日期格式
     
-    # print(time.clock())            #返回处理器时间,3.3开始已废弃 , 改成了time.process_time()测量处理器运算时间,不包括sleep时间,不稳定,mac上测不出来
-    # print(time.altzone)           #返回与utc时间的时间差,以秒计算\
-    # print(time.asctime())         #返回时间格式"Fri Aug 19 11:14:16 2016",
-    # print(time.localtime())       #返回本地时间 的struct time对象格式
-    # print(time.gmtime(time.time()-800000)) #返回utc时间的struc时间对象格式
+    print(time.clock())            #返回处理器时间,3.3开始已废弃 , 改成了time.process_time()测量处理器运算时间,不包括sleep时间,不稳定,mac上测不出来
+    print(time.altzone)           #返回与utc时间的时间差,以秒计算\
+    print(time.asctime())         #返回时间格式"Fri Aug 19 11:14:16 2016",
+    print(time.localtime())       #返回本地时间 的struct time对象格式
+    print(time.gmtime(time.time()-800000)) #返回utc时间的struc时间对象格式
     
-    # print(time.asctime(time.localtime())) #返回时间格式"Fri Aug 19 11:14:16 2016",
-    #print(time.ctime())            #返回Fri Aug 19 12:38:29 2016 格式, 同上
+    print(time.asctime(time.localtime())) #返回时间格式"Fri Aug 19 11:14:16 2016",
+    print(time.ctime())            #返回Fri Aug 19 12:38:29 2016 格式, 同上
     
-    # 日期字符串 转成  时间戳
-    # string_2_struct = time.strptime("2016/05/22","%Y/%m/%d") #将 日期字符串 转成 struct时间对象格式
-    # print(string_2_struct)
-    # #
-    # struct_2_stamp = time.mktime(string_2_struct) #将struct时间对象转成时间戳
-    # print(struct_2_stamp) 
-    #将时间戳转为字符串格式
-    # print(time.gmtime(time.time()-86640)) #将utc时间戳转换成struct_time格式
-    # print(time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime()) ) #将utc struct_time格式转成指定的字符串格式
-    #时间加减
+    日期字符串 转成  时间戳
+    string_2_struct = time.strptime("2016/05/22","%Y/%m/%d") #将 日期字符串 转成 struct时间对象格式
+    print(string_2_struct)
+    struct_2_stamp = time.mktime(string_2_struct) #将struct时间对象转成时间戳
+    print(struct_2_stamp) 
+    将时间戳转为字符串格式
+    print(time.gmtime(time.time()-86640)) #将utc时间戳转换成struct_time格式
+    print(time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime()) ) #将utc struct_time格式转成指定的字符串格式
+    时间加减
     import datetime    
-    # print(datetime.datetime.now()) #返回 2016-08-19 12:47:03.941925
-    #print(datetime.date.fromtimestamp(time.time()) )  # 时间戳直接转成日期格式 2016-08-19
-    # print(datetime.datetime.now() )
-    # print(datetime.datetime.now() + datetime.timedelta(3)) #当前时间+3天
-    # print(datetime.datetime.now() + datetime.timedelta(-3)) #当前时间-3天
-    # print(datetime.datetime.now() + datetime.timedelta(hours=3)) #当前时间+3小时
-    # print(datetime.datetime.now() + datetime.timedelta(minutes=30)) #当前时间+30分
-    # c_time  = datetime.datetime.now()
-    # print(c_time.replace(minute=3,hour=2)) #时间替换
+    print(datetime.datetime.now()) #返回 2016-08-19 12:47:03.941925
+    print(datetime.date.fromtimestamp(time.time()) )  # 时间戳直接转成日期格式 2016-08-19
+    print(datetime.datetime.now() )
+    print(datetime.datetime.now() + datetime.timedelta(3)) #当前时间+3天
+    print(datetime.datetime.now() + datetime.timedelta(-3)) #当前时间-3天
+    print(datetime.datetime.now() + datetime.timedelta(hours=3)) #当前时间+3小时
+    print(datetime.datetime.now() + datetime.timedelta(minutes=30)) #当前时间+30分
+    c_time  = datetime.datetime.now()
+    print(c_time.replace(minute=3,hour=2)) #时间替换
     操作:
-        #取当前时间
+        取当前时间
         >>> time.strftime('%Y-%m-%d %H:%M:%S')
         '2016-11-16 12:22:47'
 ##1.5、常用模块之
