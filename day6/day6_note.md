@@ -77,7 +77,7 @@
         >>> print(type(dict_json))
         <class 'dict'>
         dump、load和dumps、loads使用方法一样,不过是保存在文件中
-###1.4、常用模块之time和datetime
+##1.4、常用模块之time和datetime
     方法名	                            说明
     time.sleep(int)	                等待时间
     time.time()	                    输出时间戳，从1970年1月1号到现在用了多少秒
@@ -125,4 +125,199 @@
         #取当前时间
         >>> time.strftime('%Y-%m-%d %H:%M:%S')
         '2016-11-16 12:22:47'
-##1.5、常用模块之
+##1.5、常用模块之xml
+    python中用来解析xml的模块为ElementTree
+    #自创xml文件
+        import xml.etree.ElementTree as ET#导入方法
+        new_xml = ET.Element("namelist")#第一层标签
+        name = ET.SubElement(new_xml,"name",attrib={"enrolled":"yes"})#第二层
+        age = ET.SubElement(name,"age",attrib={"checked":"no"})#第三层
+        sex = ET.SubElement(name,"sex")#第三层标签
+        sex.text = '33'#标签的内容
+        name2 = ET.SubElement(new_xml,"name",attrib={"enrolled":"no"})
+        age = ET.SubElement(name2,"age")
+        age.text = '19'
+         
+        et = ET.ElementTree(new_xml) #生成文档对象
+        et.write("test.xml", encoding="utf-8",xml_declaration=True)
+    #xml的增删改查
+        xml文件:
+        <?xml version="1.0"?>
+        <data>
+            <country name="Liechtenstein">
+                <rank updated="yes">2</rank>
+                <year>2008</year>
+                <gdppc>141100</gdppc>
+                <neighbor name="Austria" direction="E"/>
+                <neighbor name="Switzerland" direction="W"/>
+            </country>
+            <country name="Singapore">
+                <rank updated="yes">5</rank>
+                <year>2011</year>
+                <gdppc>59900</gdppc>
+                <neighbor name="Malaysia" direction="N"/>
+            </country>
+            <country name="Panama">
+                <rank updated="yes">69</rank>
+                <year>2011</year>
+                <gdppc>13600</gdppc>
+                <neighbor name="Costa Rica" direction="W"/>
+                <neighbor name="Colombia" direction="E"/>
+            </country>
+        </data>
+        代码:
+        import xml.etree.ElementTree as ET
+        tree = ET.parse("xmltest.xml")
+        root = tree.getroot()
+        print(root.tag)
+        #遍历xml文档
+        for child in root:
+            print(child.tag, child.attrib)
+            for i in child:
+                print(i.tag,i.text)
+        #只遍历year 节点
+        for node in root.iter('year'):
+            print(node.tag,node.text)
+        import xml.etree.ElementTree as ET
+        tree = ET.parse("xmltest.xml")
+        root = tree.getroot()
+        #修改
+        for node in root.iter('year'):
+            new_year = int(node.text) + 1
+            node.text = str(new_year)
+            node.set("updated","yes")
+         
+        tree.write("xmltest.xml")
+         
+         
+        #删除node
+        for country in root.findall('country'):
+           rank = int(country.find('rank').text)
+           if rank > 50:
+             root.remove(country)
+         
+        tree.write('output.xml')
+##1.6、常用函数之configparser
+    configparser用于处理特定格式的文件，其本质上是利用open来操作文件
+    文件如下:
+        好多软件的常见文档格式如下
+        [DEFAULT]
+        ServerAliveInterval = 45
+        Compression = yes
+        CompressionLevel = 9
+        ForwardX11 = yes
+         
+        [bitbucket.org]
+        User = hg
+         
+        [topsecret.server.com]
+        Port = 50022
+        ForwardX11 = no
+    #生成:
+        import configparser
+        config = configparser.ConfigParser()
+        config["DEFAULT"] = {'ServerAliveInterval': '45',
+                              'Compression': 'yes',
+                             'CompressionLevel': '9'}
+                                      
+        config['bitbucket.org'] = {}
+        config['bitbucket.org']['User'] = 'hg'
+        config['topsecret.server.com'] = {}
+        
+        topsecret = config['topsecret.server.com']
+        topsecret['Host Port'] = '50022'     # mutates the parser
+        topsecret['ForwardX11'] = 'no'  # same here
+        config['DEFAULT']['ForwardX11'] = 'yes'
+        
+        with open('example.ini', 'w') as configfile:
+           config.write(configfile)
+    #读取:
+        import configparser
+        >>> config = configparser.ConfigParser()
+        >>> config.sections()
+        []
+        >>> config.read('example.ini')
+        ['example.ini']
+        >>> config.sections()
+        ['bitbucket.org', 'topsecret.server.com']
+        >>> 'bitbucket.org' in config
+        True
+        >>> 'bytebong.com' in config
+        False
+        >>> config['bitbucket.org']['User']
+        'hg'
+        >>> config['DEFAULT']['Compression']
+        'yes'
+        >>> topsecret = config['topsecret.server.com']
+        >>> topsecret['ForwardX11']
+        'no'
+        >>> topsecret['Port']
+        '50022'
+        >>> for key in config['bitbucket.org']: print(key)
+        ...
+        user
+        compressionlevel
+        serveraliveinterval
+        compression
+        forwardx11
+        >>> config['bitbucket.org']['ForwardX11']
+        'yes'
+##1.7、常用模块之shutil
+    用途:高级的 文件、文件夹、压缩包 处理模块
+    
+    shutil.copyfileobj(fsrc, fdst[, length])#将文件内容拷贝到另一个文件中，可以部分内容
+    shutil.copyfile(src, dst)#拷贝文件
+    shutil.copymode(src, dst)#仅拷贝权限。内容、组、用户均不变
+    shutil.copystat(src, dst)   #拷贝状态的信息，包括：mode bits, atime, mtime, flags
+    shutil.copy(src, dst)#拷贝文件和权限 常用
+    shutil.copy2(src, dst)#拷贝文件和状态信息 常用
+    shutil.ignore_patterns(*py) #过滤py结尾的
+    shutil.copytree(src, dst,ignore=shutil.ignore_patterns(*py)) #递归的去拷贝文件并排除py结尾的
+    shutil.rmtree(path[, ignore_errors[, onerror]])#递归的去删除文件也可指定文件
+    shutil.move(src, dst)   #递归的去移动文件
+    shutil.make_archive(base_name, format,...)
+    #创建压缩包并返回文件路径，例如：zip、tar
+    base_name： 压缩包的文件名，也可以是压缩包的路径。只是文件名时，则保存至当前目录，否则保存至指定路径，
+    如：www                        =>保存至当前路径
+    如：/Users/wupeiqi/www =>保存至/Users/wupeiqi/
+    format：	压缩包种类，“zip”, “tar”, “bztar”，“gztar”
+    root_dir：	要压缩的文件夹路径（默认当前目录）
+    owner：	用户，默认当前用户
+    group：	组，默认当前组
+    操作:
+        #将 /Users/wupeiqi/Downloads/test 下的文件打包放置当前程序目录
+        import shutil
+        ret = shutil.make_archive("wwwwwwwwww", 'gztar', root_dir='/Users/wupeiqi/Downloads/test')
+         
+         
+        #将 /Users/wupeiqi/Downloads/test 下的文件打包放置 /Users/wupeiqi/目录
+        import shutil
+        ret = shutil.make_archive("/Users/wupeiqi/wwwwwwwwww", 'gztar', root_dir='/Users/wupeiqi/Downloads/test')
+        
+    shutil 对压缩包的处理是调用 ZipFile 和 TarFile 两个模块来进行的，详细：
+        import zipfile
+        
+        # 压缩
+        z = zipfile.ZipFile('laxi.zip', 'w')
+        z.write('a.log')
+        z.write('data.data')
+        z.close()
+        
+        # 解压
+        z = zipfile.ZipFile('laxi.zip', 'r')
+        z.extractall()
+        z.close()
+        
+        import tarfile
+        # 压缩
+        tar = tarfile.open('your.tar','w')
+        tar.add('/Users/wupeiqi/PycharmProjects/bbs2.zip', arcname='bbs2.zip')
+        tar.add('/Users/wupeiqi/PycharmProjects/cmdb.zip', arcname='cmdb.zip')
+        tar.close()
+        
+        # 解压
+        tar = tarfile.open('your.tar','r')
+        tar.extractall()  # 可设置解压地址
+        tar.close()
+        
+##1.8、常用模块之random
