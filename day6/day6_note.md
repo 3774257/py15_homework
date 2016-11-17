@@ -321,3 +321,30 @@
         tar.close()
         
 ##1.8、常用模块之random
+    用于生成随机数
+    import random
+    print random.random()
+    print random.randint(1,2)
+    print random.randrange(1,10)
+##1.9、常用模块之hashlib
+    #用于加密
+    import hashlib
+    # ######## md5 ########
+     
+    hash = hashlib.md5()
+    hash.update('admin')
+    #可写成hashlib.md5('admin')
+    print(hash.hexdigest())
+     
+    # ######## sha1 ########
+     
+    hash = hashlib.sha1()
+    hash.update('admin')
+    print(hash.hexdigest())
+     
+    # ######## sha256 ########
+     
+    hash = hashlib.sha256()
+    hash.update('admin')
+    print(hash.hexdigest())
+##1.9.1、
