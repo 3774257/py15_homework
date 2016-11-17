@@ -1,6 +1,6 @@
 #今日内容
 +   常用模块
-+   re正则
++   re正则(https://github.com/jijianming/py15_homework/blob/master/day6/re.md)
 
 ##1.1、常用模块之os模块
     模块方法	                        说明
