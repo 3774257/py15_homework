@@ -4,8 +4,8 @@
 +   socket
 ##1、异常处理
     try:
-    # 主代码块
-    pass
+        # 主代码块
+        pass
     except KeyError,e:
         # 异常时，执行该块
         pass
