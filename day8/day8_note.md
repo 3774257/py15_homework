@@ -1,8 +1,11 @@
 ##本周内容
+
 +   异常处理
 +   反射
 +   socket
+
 ##1、异常处理
+    
     try:
         #主代码块
         pass
@@ -18,7 +21,7 @@
     python常用的异常:
     异常名称	                描述
     BaseException	        所有异常的基类
-    SystemExit	            解释器请求退出
+    SystemExit	        解释器请求退出
     KeyboardInterrupt	    用户中断执行(通常是输入^C)
     Exception	            常规错误的基类
     StopIteration	        迭代器没有更多的值
