@@ -20,7 +20,7 @@
     python常用的异常:
         异常名称	                描述
         BaseException	        所有异常的基类
-        SystemExit	        解释器请求退出
+        SystemExit	            解释器请求退出
         KeyboardInterrupt	    用户中断执行(通常是输入^C)
         Exception	            常规错误的基类
         StopIteration	        迭代器没有更多的值
@@ -89,8 +89,11 @@
         print (getattr(Foo, 'bar'))
         
 ##3、socket
-    socket通常也称作"套接字"，用于描述IP地址和端口，是一个通信链的句柄，应用程序通常通过"套接字"向网络发出请求或者应答网络请求。
-    socket起源于Unix，而Unix/Linux基本哲学之一就是“一切皆文件”，对于文件用【打开】【读写】【关闭】模式来操作。socket就是该模式的一个实现，socket即是一种特殊的文件，
+    socket通常也称作"套接字"，用于描述IP地址和端口，是一个通信链的句柄，
+        应用程序通常通过"套接字"向网络发出请求或者应答网络请求。
+    socket起源于Unix，而Unix/Linux基本哲学之一就是“一切皆文件”，
+        对于文件用【打开】【读写】【关闭】模式来操作。socket就是该模式的一个实现，
+        socket即是一种特殊的文件，
     一些socket函数就是对其进行的操作（读/写IO、打开、关闭）
     socket和file的区别：
         file模块是针对某个指定文件进行【打开】【读写】【关闭】
