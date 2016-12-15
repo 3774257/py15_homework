@@ -21,6 +21,77 @@
     供电不足，同一时间只能给一个车间供电，为了能让所有车间都能同时生产，你的工厂的电工只能给不同的车间分时供电，但是轮到你的qq车间时，
     发现只有一个干活的工人，结果生产效率极低，为了解决这个问题，应该怎么办呢？。。。。没错，你肯定想到了，就是多加几个工人，让几个人工人并行工作，
     这每个工人，就是线程！
-##线程:
-    1、语法
+    进程：
+        一个程序要运行时所需的所有资源的集合
+        进程是资源的集合相当于一个车间
+        一个进程至少需要一个线程，这个线程称为主线程
+        一个进程里可以有多个线程
+        cpu cores越多，代表着你可以真正并发的线程越多
+        两个进程之间的数据是完全独立的。互相不能访问。
         
+        
+    线程：
+        一道单一的指令的控制流寄生在进程中
+        单一进程里的多个线程是共享数据的
+        多个线程在涉及修改同一个数据时，一定要加锁
+##python GIL全局解释器锁
+    无论你启多少个线程，你有多少个cpu, Python在执行的时候会淡定的在同一时刻只允许一个线程运行
+##线程:
+    线程是操作系统能够进行运算调度的最小单位。它被包含在进程之中，是进程中的实际运作单位。一条线程指的是进程中一个单一顺序的控制流，
+    一个进程中可以并发多个线程，每条线程并行执行不同的任务。
+    1、语法
+        import threading
+        import time
+         
+        def sayhi(num): #定义每个线程要运行的函数
+         
+            print("running on number:%s" %num)
+         
+            time.sleep(3)
+         
+        if __name__ == '__main__':
+         
+            t1 = threading.Thread(target=sayhi,args=(1,)) #生成一个线程实例
+            t2 = threading.Thread(target=sayhi,args=(2,)) #生成另一个线程实例
+         
+            t1.start() #启动线程
+            t2.start() #启动另一个线程
+         
+            print(t1.getName()) #获取线程名
+            print(t2.getName())
+            
+        start           线程准备就绪，等待CPU调度
+        setName         为线程设置名称
+        getName         获取线程名称
+        setDaemon       设置为后台线程或前台线程（默认）
+                        如果是后台线程，主线程执行过程中，后台线程也在进行，主线程执行完毕后，后台线程不论成功与否，均停止
+                        如果是前台线程，主线程执行过程中，前台线程也在进行，主线程执行完毕后，等待前台线程也执行完成后，程序停止
+        join            逐个执行每个线程，执行完毕后继续往下执行，该方法使得多线程变得无意义
+        
+        import time
+        import threading
+         
+         
+        def run(n):
+         
+            print('[%s]------running----\n' % n)
+            time.sleep(2)
+            print('--done--')
+         
+        def main():
+            for i in range(5):
+                t = threading.Thread(target=run,args=[i,])
+                t.start()
+                t.join(1)
+                print('starting thread', t.getName())
+         
+         
+        m = threading.Thread(target=main,args=[])
+        m.setDaemon(True) #将main线程设置为Daemon线程,它做为程序主线程的守护线程,
+        #当主线程退出时,m线程也会退出,由m启动的其它子线程会同时退出,不管是否执行完任务
+        m.start()
+        m.join(timeout=2)
+        print("---main thread done----")
+    2、线程锁(互斥锁Mutex)
+        一个进程下可以启动多个线程，多个线程共享父进程的内存空间，也就意味着每个线程可以访问同一份数据，
+        此时，如果2个线程同时要修改同一份数据，会出现什么状况？
