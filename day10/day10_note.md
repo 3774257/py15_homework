@@ -95,3 +95,115 @@
     2、线程锁(互斥锁Mutex)
         一个进程下可以启动多个线程，多个线程共享父进程的内存空间，也就意味着每个线程可以访问同一份数据，
         此时，如果2个线程同时要修改同一份数据，会出现什么状况？
+            import time
+            import threading
+             
+            def addNum():
+                global num #在每个线程中都获取这个全局变量
+                print('--get num:',num )
+                time.sleep(1)
+                num  -=1 #对此公共变量进行-1操作         
+            num = 100  #设定一个共享变量
+            thread_list = []
+            for i in range(100):
+                t = threading.Thread(target=addNum)
+                t.start()
+                thread_list.append(t)         
+            for t in thread_list: #等待所有线程执行完毕
+                t.join()
+            print('final num:', num )
+        
+        正常来讲，这个num结果应该是0， 但在python 2.7上多运行几次，会发现，最后打印出来的num结果不总是0，为什么每次运行的结果不一样呢？ 
+        哈，很简单，假设你有A,B两个线程，此时都 要对num 进行减1操作， 由于2个线程是并发同时运行的，所以2个线程很有可能同时拿走了num=100这个初始变量交给cpu去运算，
+        当A线程去处完的结果是99，但此时B线程运算完的结果也是99，两个线程同时CPU运算的结果再赋值给num变量后，结果就都是99。那怎么办呢？ 很简单，每个线程在要修改公共数据时，
+        为了避免自己在还没改完的时候别人也来修改此数据，可以给这个数据加一把锁， 这样其它线程想修改此数据时就必须等待你修改完毕并把锁释放掉后才能再访问此数据。 
+        *注：不要在3.x上运行，不知为什么，3.x上的结果总是正确的，可能是自动加了锁
+        加锁版本:
+            import time
+            import threading
+             
+            def addNum():
+                global num #在每个线程中都获取这个全局变量
+                print('--get num:',num )
+                time.sleep(1)
+                lock.acquire() #修改数据前加锁
+                num  -=1 #对此公共变量进行-1操作
+                lock.release() #修改后释放
+             
+            num = 100  #设定一个共享变量
+            thread_list = []
+            lock = threading.Lock() #生成全局锁
+            for i in range(100):
+                t = threading.Thread(target=addNum)
+                t.start()
+                thread_list.append(t)
+             
+            for t in thread_list: #等待所有线程执行完毕
+                t.join()
+             
+            print('final num:', num )
+    3、Semaphore(信号量)
+        互斥锁 同时只允许一个线程更改数据，而Semaphore是同时允许一定数量的线程更改数据 ，比如厕所有3个坑，那最多只允许3个人上厕所，后面的人只能等里面有人出来了才能再进去。
+        import threading,time
+ 
+        def run(n):
+            semaphore.acquire()
+            time.sleep(1)
+            print("run the thread: %s\n" %n)
+            semaphore.release()
+         
+        if __name__ == '__main__':
+         
+            num= 0
+            semaphore  = threading.BoundedSemaphore(5) #最多允许5个线程同时运行
+            for i in range(20):
+                t = threading.Thread(target=run,args=(i,))
+                t.start()
+         
+        while threading.active_count() != 1:
+            pass #print threading.active_count()
+        else:
+            print('----all threads done---')
+            print(num)
+    4、事件（event）
+        python线程的事件用于主线程控制其他线程的执行，事件主要提供了三个方法 set、wait、clear。
+        
+        事件处理的机制：全局定义了一个“Flag”，如果“Flag”值为 False，那么当程序执行 event.wait 方法时就会阻塞，
+        如果“Flag”值为True，那么event.wait 方法时便不再阻塞。
+        clear：将“Flag”设置为False
+        set：将“Flag”设置为True
+        import threading,time
+        import random
+        def light():
+            if not event.isSet():
+                event.set() #wait就不阻塞 #绿灯状态
+            count = 0
+            while True:
+                if count < 10:
+                    print('\033[42;1m--green light on---\033[0m')
+                elif count <13:
+                    print('\033[43;1m--yellow light on---\033[0m')
+                elif count <20:
+                    if event.isSet():
+                        event.clear()
+                    print('\033[41;1m--red light on---\033[0m')
+                else:
+                    count = 0
+                    event.set() #打开绿灯
+                time.sleep(1)
+                count +=1
+        def car(n):
+            while 1:
+                time.sleep(random.randrange(10))
+                if  event.isSet(): #绿灯
+                    print("car [%s] is running.." % n)
+                else:
+                    print("car [%s] is waiting for the red light.." %n)
+        if __name__ == '__main__':
+            event = threading.Event()
+            Light = threading.Thread(target=light)
+            Light.start()
+            for i in range(3):
+                t = threading.Thread(target=car,args=(i,))
+                t.start()
+        
