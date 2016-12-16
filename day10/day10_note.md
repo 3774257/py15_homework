@@ -206,4 +206,339 @@
             for i in range(3):
                 t = threading.Thread(target=car,args=(i,))
                 t.start()
+    5、生产者消费者模型
+        在并发编程中使用生产者和消费者模式能够解决绝大多数并发问题。该模式通过平衡生产线程和消费线程的工作能力来提高程序的整体处理数据的速度。
+        为什么要使用生产者和消费者模式
         
+        在线程世界里，生产者就是生产数据的线程，消费者就是消费数据的线程。在多线程开发当中，如果生产者处理速度很快，而消费者处理速度很慢，那
+        么生产者就必须等待消费者处理完，才能继续生产数据。同样的道理，如果消费者的处理能力大于生产者，那么消费者就必须等待生产者。为了解决这
+        个问题于是引入了生产者和消费者模式。 
+        什么是生产者消费者模式
+        生产者消费者模式是通过一个容器来解决生产者和消费者的强耦合问题。生产者和消费者彼此之间不直接通讯，而通过阻塞队列来进行通讯，所以生产
+        者生产完数据之后不用等待消费者处理，直接扔给阻塞队列，消费者不找生产者要数据，而是直接从阻塞队列里取，阻塞队列就相当于一个缓冲区，平
+        衡了生产者和消费者的处理能力。
+        例如:
+            import threading
+            import queue
+             
+            def producer():
+                for i in range(10):
+                    q.put("骨头 %s" % i )
+                print("开始等待所有的骨头被取走...")
+                q.join()
+                print("所有的骨头被取完了...")
+            def consumer(n):
+                while q.qsize() >0:
+                    print("%s 取到" %n  , q.get())
+                    q.task_done() #告知这个任务执行完了  
+            q = queue.Queue()
+            p = threading.Thread(target=producer,)
+            p.start()
+            c1 = consumer("李闯")
+##进程
+    1、语法
+        from multiprocessing import Process
+        import time
+        def f(name):
+            time.sleep(2)
+            print('hello', name)
+         
+        if __name__ == '__main__':
+            p = Process(target=f, args=('bob',))
+            p.start()
+            p.join()
+    2、进程间的通信
+        不同进程间内存是不共享的，要想实现两个进程间的数据交换，可以用以下方法：
+        Queues:
+        使用方法跟threading里的queue差不多
+            from multiprocessing import Process, Queue
+             
+            def f(q):
+                q.put([42, None, 'hello'])
+             
+            if __name__ == '__main__':
+                q = Queue()
+                p = Process(target=f, args=(q,))
+                p.start()
+                print(q.get())    # print "[42, None, 'hello']"
+                p.join()
+        Pipes:
+            from multiprocessing import Process, Pipe
+ 
+            def f(conn):
+                conn.send([42, None, 'hello'])
+                conn.close()
+             
+            if __name__ == '__main__':
+                parent_conn, child_conn = Pipe()
+                p = Process(target=f, args=(child_conn,))
+                p.start()
+                print(parent_conn.recv())   # prints "[42, None, 'hello']"
+                p.join()
+        Managers:
+            from multiprocessing import Process, Manager
+ 
+            def f(d, l):
+                d[1] = '1'
+                d['2'] = 2
+                d[0.25] = None
+                l.append(1)
+                print(l)
+             
+            if __name__ == '__main__':
+                with Manager() as manager:
+                    d = manager.dict()
+             
+                    l = manager.list(range(5))
+                    p_list = []
+                    for i in range(10):
+                        p = Process(target=f, args=(d, l))
+                        p.start()
+                        p_list.append(p)
+                    for res in p_list:
+                        res.join()
+             
+                    print(d)
+                    print(l)
+    3、进程同步:
+        没有使用锁从不同进程的输出容易得到所有混合。
+        from multiprocessing import Process, Lock
+        def f(l, i):
+            l.acquire()
+            try:
+                print('hello world', i)
+            finally:
+                l.release()
+         
+        if __name__ == '__main__':
+            lock = Lock()
+            for num in range(10):
+                Process(target=f, args=(lock, num)).start()
+    4、进程池:
+        进程池内部维护一个进程序列，当使用时，则去进程池中获取一个进程，如果进程池序列中没有可供使用的进进程，那么程序就会等待，直到进程池中有可用进程为止。
+        进程池中有两个方法：
+            apply
+            apply_async
+        例如:
+            from  multiprocessing import Process,Pool
+            import time
+             
+            def Foo(i):
+                time.sleep(2)
+                return i+100
+             
+            def Bar(arg):
+                print('-->exec done:',arg)
+             
+            pool = Pool(5)
+             
+            for i in range(10):
+                pool.apply_async(func=Foo, args=(i,),callback=Bar)
+                #pool.apply(func=Foo, args=(i,))
+             
+            print('end')
+            pool.close()
+            pool.join()#进程池中进程执行完毕后再关闭，如果注释，那么程序直接关闭
+        使用地址池,要保持进程同步,需要用到Manager中的Lock
+            #!/usr/bin/env python3
+            # -*- coding: utf-8 -*-
+            # @Time    : 16/12/13 09:54
+            # @Author  : walker
+            # @Site    : 
+            # @File    : ssh.py.py
+            # @Software: PyCharm
+            import configparser
+            import optparse
+            import sys,time,os
+            from multiprocessing import Pool,Manager
+            import paramiko
+            class SSH(object):
+                ip_list = []
+                # paramiko.util.log_to_file('paramiko.log')
+                def __init__(self):
+                    self.parser = optparse.OptionParser()
+                    self.parser.add_option('-H','--hostname',dest='hostname',help='remote hostname') #定义参数
+                    self.parser.add_option('-g','--groupname',dest='groupname',help='remote groupname')
+                    self.parser.add_option('--cmd','--cmd',dest='cmd',help='Execute command')
+                    self.options,self.args = self.parser.parse_args()
+                    self.conf = configparser.ConfigParser()
+                    self.s = paramiko.SSHClient()
+                    self.s.set_missing_host_key_policy(paramiko.AutoAddPolicy())#忽略第一次连接添加host文件
+                    self.conf.read('config.cfg')#读取主机配置文件,没有实现指定配置文件
+                    self.data = self.check_args()#检测参数合法性
+                    if self.data:#参数正确
+                        # print('检测参数正确...')
+                        # print(self.data)
+                        ip_info = self.check_ip()#检测主机相关信息
+                        if ip_info:
+                            # print('检测ip正确')
+                            # print('ip_info',ip_info)
+                            self.execute_command(ip_info)#执行命令
+            
+                def connect_server(self,l,args):
+                    '''
+                    连接远程服务器
+                    '''
+                    # print(args)
+                    l.acquire()#加锁
+                    # print('父进程:%s,子进程:%s'% (os.getppid(),os.getpid()))
+                    print('ip:%s at:%s cmd:%s'.center(50, '-') % (args['ip'],time.strftime("%Y-%m-%d %H:%M:%S"),args['cmd']))
+                    try:
+            
+                        self.s.connect(args['ip'], int(args['port']), args['user'],args['passwd'])#连接服务器
+                    except Exception as e:
+                        print('连接失败,请查看防火墙...')
+                    else:
+                        stdin, stdout, stderr = self.s.exec_command(args['cmd'])#远程执行命令
+                        print(stdout.read().decode())#获取结果
+                    l.release()#解锁
+                    # time.sleep(1)
+                def execute_command(self,ip_info):
+                    '''
+                    执行相关命令;
+                    对Pool对象调用join()方法会等待所有子进程执行完毕，
+                    调用join()之前必须先调用close()，
+                    调用close()之后就不能继续添加新的Process
+                    '''
+                    # print('ip_list',ip_info)
+                    p = Pool(8)#定义地址池
+                    manager = Manager()
+                    lock = manager.Lock()#初始化锁、保持进程同步
+                    for ip in ip_info:
+                        p.apply_async(self.connect_server, args=(lock,ip,))
+                    p.close()
+                    p.join()
+                    print('All subprocesses done.')
+                def check_ip(self):
+                    '''
+                    获取主机相关信息
+                    :return:
+                    '''
+                    if self.data['hostname'] is None:#没有输入主机名的情况 python3 ssh.py -g xxx --cmd xxx
+                        if self.data['groupname'] not in self.conf.sections():
+                            print('找不到 %s 主机组...'% self.data['groupname'])
+                            return False
+                        else:
+                            k = self.conf.items(self.data['groupname'])
+                            if k[0][0] != k[0][1]:#防止 python3 ssh.py -g h1(主机名而不是主机组名) --cmd xxx
+                                print('找不到 %s 主机组...'% self.data['groupname'])
+                                return False
+                            else:
+                                #在没有输入主机名的情况下获取主机组里面的每个主机的相关信息
+                                for i in self.conf.options(self.data['groupname']):
+                                    ip = self.conf.get(i,'ip')
+                                    port = self.conf.get(i,'port')
+                                    user = self.conf.get(i, 'user')
+                                    passwd = self.conf.get(i, 'passwd')
+                                    cmd = self.data['cmd']
+                                    ip_dict = {
+                                        'ip': ip,
+                                        'port': port,
+                                        'user': user,
+                                        'passwd': passwd,
+                                        'cmd':cmd
+                                    }
+                                    self.ip_list.append(ip_dict)
+                                return self.ip_list
+            
+                    elif self.data['groupname'] is None:#没有输入主机组名的情况 python3 ssh.py -H xxx --cmd xxx
+                        if self.data['hostname'] not in self.conf.sections():
+                            print('找不到 %s 主机...'% self.data['hostname'])
+                            return False
+                        else:
+                            k = self.conf.items(self.data['hostname'])#防止 python3 ssh.py -H server_groups(主机组名而不是主机名) --cmd xxx
+                            # print('k', k)
+                            if k[0][0] == k[0][1]:
+                                print('找不到 %s 主机...' % self.data['hostname'])
+                                return False
+                            else:
+                                # print(self.conf.sections())
+                                # print(self.conf.options(self.data['hostname']))
+                                #在没有输入主机组名的情况下获取主机相关信息
+                                ip = self.conf.get(self.data['hostname'],'ip')
+                                port = self.conf.get(self.data['hostname'], 'port')
+                                user = self.conf.get(self.data['hostname'], 'user')
+                                passwd = self.conf.get(self.data['hostname'], 'passwd')
+                                cmd = self.data['cmd']
+                                ip_dict ={
+                                    'ip':ip,
+                                    'port':port,
+                                    'user':user,
+                                    'passwd':passwd,
+                                    'cmd':cmd
+                                }
+                                self.ip_list.append(ip_dict)
+                                return self.ip_list
+                    else:
+                        #主机名和主机组名都有情况,例如: python3 ssh.py -H h1 -g server_groups --cmd xxx
+                        tmp_list = []#定义空列表
+                        # print('a')
+                        for i in self.data.values():#获取输入的信息
+                            if i == self.data['cmd']:continue#过滤掉cmd的信息,只留主机和主机组信息
+                            if i not in self.conf.sections():#输入的信息不在主机配置文件中
+                                exit('找不到:{}'.format(i))
+                            tmp_list.append(i)
+                        # print('tmp_list',tmp_list)
+                        for list in tmp_list:
+                            k = self.conf.items(list)#主机组名里面的key values是相同的
+                            if k[0][0] == k[0][1]:
+                                for n in k:
+                                    if n[0] in tmp_list:#过滤相同主机名
+                                        continue
+                                    else:
+                                        tmp_list.append(n[0])
+                                tmp_list.remove(list)
+                        # print('after tmp_list', tmp_list)
+                        for m in tmp_list:#获取过滤后的主机信息
+                            ip = self.conf.get(m, 'ip')
+                            port = self.conf.get(m, 'port')
+                            user = self.conf.get(m, 'user')
+                            passwd = self.conf.get(m, 'passwd')
+                            cmd = self.data['cmd']
+                            ip_dict = {
+                                'ip': ip,
+                                'port': port,
+                                'user': user,
+                                'passwd': passwd,
+                                'cmd':cmd
+                            }
+                            self.ip_list.append(ip_dict)
+            
+                        return self.ip_list
+            
+                def check_args(self):
+                    if self.options.cmd == None:#没有输入要执行的命令
+                        print('请输入要执行的命令')
+                        return False
+                    if self.options.hostname is None and self.options.groupname is None:#主机和主机组必须要有一个
+                        print('请输入要连接的服务器')
+                        return False
+                    if self.options.groupname is None:#若没有输入主机组
+                        data = {
+                            'hostname':self.options.hostname,
+                            'groupname':None,
+                            'cmd': self.options.cmd
+                        }
+                        return data
+                    else:
+                        if self.options.hostname is None:#若没有输入主机
+                            data = {
+                                'hostname': None,
+                                'groupname': self.options.groupname,
+                                'cmd':self.options.cmd
+                            }
+                            return data
+                        else:#主机和主机组都有输入
+                            data = {
+                                'hostname': self.options.hostname,
+                                'groupname': self.options.groupname,
+                                'cmd': self.options.cmd
+                            }
+                            # print('主机、主机组都有输入')
+                            return data
+            
+            if __name__ == '__main__':
+                if len(sys.argv) == 1:
+                    print('请执行%s -h'% sys.argv[0])
+                else:
+                    ssh = SSH()
