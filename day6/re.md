@@ -18,7 +18,7 @@
         '\D'    匹配非数字
         '\w'    匹配[A-Za-z0-9]
         '\W'    匹配非[A-Za-z0-9]
-        's'     匹配空白字符、\t、\n、\r , re.search("\s+","ab\tc1\n3").group() 结果 '\t'
+        '\s'     匹配空白字符、\t、\n、\r , re.search("\s+","ab\tc1\n3").group() 结果 '\t'
          
         '(?P<name>...)' 分组匹配 re.search("(?P<province>[0-9]{4})(?P<city>[0-9]{2})(?P<birthday>[0-9]{4})","371481199306143242").groupdict("city") 结果{'province': '3714', 'city': '81', 'birthday': '1993'}
     最常用的匹配语法:
