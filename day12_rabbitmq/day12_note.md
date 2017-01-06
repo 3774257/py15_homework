@@ -83,7 +83,7 @@
         手头工作并一直空闲的情况。我们可以通过设置prefetchCount来限制Queue每次发送给每个消费者的
         消息数，比如我们设置prefetchCount=1，则Queue每次给每个消费者发送一条消息；消费者处理完这
         条消息后Queue会再给该消费者发送一条消息。
-       ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-04.png)
+       ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-04.png)    
     +   例子：
     
             channel.basic_qos(prefetch_count=1)
@@ -135,3 +135,99 @@
                                   queue='task_queue')
              
             channel.start_consuming()
+
++   Exchange(交换器):
+        
+        在上一节我们看到生产者将消息投递到Queue中，实际上这在RabbitMQ中这种事情永远都不会发生。
+        实际的情况是，生产者将消息发送到Exchange（交换器，下图中的X），由Exchange将消息路由到
+        一个或多个Queue中（或者丢弃）。
+       ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-05.png)
+        
+        Exchange是按照什么逻辑将消息路由到Queue的？这个将在Binding一节介绍。
+        RabbitMQ中的Exchange有四种类型，不同的类型有着不同的路由策略，
+        这将在Exchange Types一节介绍。
++   routing key:
+        
+        生产者在将消息发送给Exchange的时候，一般会指定一个routing key，
+        来指定这个消息的路由规则，而这个routing key需要与Exchange Type
+        及binding key联合使用才能最终生效。在Exchange Type与binding key
+        固定的情况下（在正常使用时一般这些内容都是固定配置好的），我们的生产者就
+        可以在发送消息给Exchange时，通过指定routing key来决定消息流向哪里。
+        RabbitMQ为routing key设定的长度限制为255 bytes。
++   Binding
+        
+        RabbitMQ中通过Binding将Exchange与Queue关联起来，这样RabbitMQ就知道如何正确地将消息路由到指定的Queue了。
+       ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-06.png)
+        
++   Binding key
+
+        在绑定（Binding）Exchange与Queue的同时，一般会指定一个binding key；
+        消费者将消息发送给Exchange时，一般会指定一个routing key；当binding key
+        与routing key相匹配时，消息将会被路由到对应的Queue中。这个将在Exchange 
+        Types章节会列举实际的例子加以说明。在绑定多个Queue到同一个Exchange的时候，
+        这些Binding允许使用相同的binding key。binding key 并不是在所有情况下都
+        生效，它依赖于Exchange Type，比如fanout类型的Exchange就会无视binding 
+        key，而是将消息路由到所有绑定到该Exchange的Queue。
++   Exchange Types
+
+        RabbitMQ常用的Exchange Type有fanout、direct、topic、headers这四种
+        （AMQP规范里还提到两种Exchange Type，分别为system与自定义，这里不予以描述),
+        Exchange在定义的时候是有类型的，以决定到底是哪些Queue符合条件，可以接收消息
+        fanout: 所有bind到此exchange的queue都可以接收消息
+        direct: 通过routingKey和exchange决定的那个唯一的queue可以接收消息
+        topic:所有符合routingKey(此时可以是一个表达式)的routingKey所bind的queue可以接收消息
+        下面分别进行介绍.
+    +   fanout
+            
+            fanout类型的Exchange路由规则非常简单，它会把所有发送到该Exchange的消息路由到所有与它绑定的Queue中。
+           ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-06.png)
+            
+            上图中，生产者（P）发送到Exchange（X）的所有消息都会路由到图中的两个Queue，并最终被两个消费者（C1与C2）消费。
+            
+        +   例子:
+            
+            +    生产者：
+                   
+                import pika
+                import sys
+                
+                credentials = pika.PlainCredentials('walker','123456')
+                connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',credentials=credentials))
+                channel = connection.channel()
+                
+                channel.exchange_declare(exchange='logs',
+                                     type='fanout')
+                
+                message = ' '.join(sys.argv[1:]) or "info: Hello World!"
+                channel.basic_publish(exchange='logs',
+                                  routing_key='',
+                                  body=message)
+                print(" [x] Sent %r" % message)
+                connection.close()
+               
+            +   消费者:
+            
+            
+                import pika
+                
+                credentials = pika.PlainCredentials('walker','123456')
+                connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',credentials=credentials))
+                channel = connection.channel()
+                channel.exchange_declare(exchange='logs',
+                type='fanout')
+                
+                result = channel.queue_declare(exclusive=True) #不指定queue名字,rabbit会随机分配一个名字,exclusive=True会在使用此queue的消费者断开后,自动将queue删除
+                queue_name = result.method.queue
+                
+                channel.queue_bind(exchange='logs',
+                queue=queue_name)
+                
+                print(' [*] Waiting for logs. To exit press CTRL+C')
+                
+                def callback(ch, method, properties, body):
+                print(" [x] %r" % body)
+                
+                channel.basic_consume(callback,
+                queue=queue_name,
+                no_ack=True)
+                channel.start_consuming()
