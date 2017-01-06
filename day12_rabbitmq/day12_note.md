@@ -38,6 +38,15 @@
         
         多个消费者可以订阅同一个Queue，这时Queue中的消息会被平均分摊给多个消费者进行处理，而不是每个消费者都收到所有的消息并处理。
        ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-03.png)
+        
+    +   声明queue代码：
+
+            import pika
+            credentials = pika.PlainCredentials('walker','123456')
+            connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',credentials=credentials))
+            channel = connection.channel()
+            #声明queue
+            channel.queue_declare(queue='20161226',durable=True)#durable queue持久化
 
 +   Message acknowledgment(消息确认)
         
@@ -54,3 +63,75 @@
         这样可以保证绝大部分情况下我们的RabbitMQ消息不会丢失。但依然解决不了小概率丢失事件的发生（比如RabbitMQ服务器已经接收到
         生产者的消息，但还没来得及持久化该消息时RabbitMQ服务器就断电了），如果我们需要对这种小概率事件也要管理起来，那么我们要用
         到事务。由于这里仅为RabbitMQ的简单介绍，所以这里将不讲解RabbitMQ相关的事务。
+    +   例子：
+            
+        +   queue持久化:
+            
+                channel.queue_declare(queue='hello', durable=True)
+        +   内容持久化:
+                
+                channel.basic_publish(exchange='',
+                      routing_key="task_queue",
+                      body=message,
+                      properties=pika.BasicProperties(
+                         delivery_mode = 2, # 消息持久化
+                      ))
++   Prefetch count(轮训分发):
+        
+        前面我们讲到如果有多个消费者同时订阅同一个Queue中的消息，Queue中的消息会被平摊给多个消费者。
+        这时如果每个消息的处理时间不同，就有可能会导致某些消费者一直在忙，而另外一些消费者很快就处理完
+        手头工作并一直空闲的情况。我们可以通过设置prefetchCount来限制Queue每次发送给每个消费者的
+        消息数，比如我们设置prefetchCount=1，则Queue每次给每个消费者发送一条消息；消费者处理完这
+        条消息后Queue会再给该消费者发送一条消息。
+       ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-04.png)
+    +   例子：
+    
+            channel.basic_qos(prefetch_count=1)
+            
++   带消息持久化+公平分发的完整代码:
+    
+    +   生产者:
+        
+            #!/usr/bin/env python
+            import pika
+            import sys
+             
+            credentials = pika.PlainCredentials('walker','123456')
+            connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',credentials=credentials))
+            channel = connection.channel()
+             
+            channel.queue_declare(queue='task_queue', durable=True)
+             
+            message = ' '.join(sys.argv[1:]) or "Hello World!"
+            channel.basic_publish(exchange='',
+                                  routing_key='task_queue',
+                                  body=message,
+                                  properties=pika.BasicProperties(
+                                     delivery_mode = 2, # make message persistent
+                                  ))
+            print(" [x] Sent %r" % message)
+            connection.close()
+    +   消费者:
+            
+            #!/usr/bin/env python
+            import pika
+            import time
+             
+            credentials = pika.PlainCredentials('walker','123456')
+            connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',credentials=credentials))
+            channel = connection.channel()
+             
+            channel.queue_declare(queue='task_queue', durable=True)
+            print(' [*] Waiting for messages. To exit press CTRL+C')
+             
+            def callback(ch, method, properties, body):
+                print(" [x] Received %r" % body)
+                time.sleep(body.count(b'.'))
+                print(" [x] Done")
+                ch.basic_ack(delivery_tag = method.delivery_tag)
+             
+            channel.basic_qos(prefetch_count=1)
+            channel.basic_consume(callback,
+                                  queue='task_queue')
+             
+            channel.start_consuming()
