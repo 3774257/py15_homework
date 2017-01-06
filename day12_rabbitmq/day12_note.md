@@ -32,4 +32,5 @@
                 
         Queue（队列）是RabbitMQ的内部对象，用于存储消息，用下图表示 
        ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-01.png)
-       
+        RabbitMQ中的消息都只能存储在Queue中，生产者（下图中的P）生产消息并最终投递到Queue中，消费者（下图中的C）可以从Queue中获取消息并消费。
+       ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-02.png)
