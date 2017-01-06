@@ -180,54 +180,263 @@
     +   fanout
             
             fanout类型的Exchange路由规则非常简单，它会把所有发送到该Exchange的消息路由到所有与它绑定的Queue中。
-           ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-06.png)
+           ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-07.png)
             
             上图中，生产者（P）发送到Exchange（X）的所有消息都会路由到图中的两个Queue，并最终被两个消费者（C1与C2）消费。
             
         +   例子:
+            +   生产者：
             
-            +    生产者：
-                   
-                import pika
-                import sys
-                
-                credentials = pika.PlainCredentials('walker','123456')
-                connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',credentials=credentials))
-                channel = connection.channel()
-                
-                channel.exchange_declare(exchange='logs',
-                                     type='fanout')
-                
-                message = ' '.join(sys.argv[1:]) or "info: Hello World!"
-                channel.basic_publish(exchange='logs',
-                                  routing_key='',
-                                  body=message)
-                print(" [x] Sent %r" % message)
-                connection.close()
-               
+                    import pika,sys
+                    credentials = pika.PlainCredentials('walker','123456')
+                    connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',credentials=credentials))
+                    
+                    channel = connection.channel()
+                    
+                    channel.exchange_declare(exchange='logs',
+                                            type='fanout')
+                    
+                    msg = ''.join(sys.argv[1:]) or "info:Hello World!"
+                    
+                    
+                    #声明queue
+                    # channel.queue_declare(queue='20161226',durable=True)#durable queue会在，内容会丢
+                    
+                    channel.basic_publish(exchange='logs',
+                                          routing_key ='',
+                                          properties = pika.BasicProperties(
+                                              delivery_mode=2, #消息持久化
+                                          ),
+                                          body=msg)
+                    
+                    print('[x] sent %s'% msg)
+                    connection.close()
             +   消费者:
             
+                    import pika
+
+                    credentials = pika.PlainCredentials('walker','123456')
+                    connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',credentials=credentials))
+                    
+                    channel = connection.channel()
+                    
+                    channel.exchange_declare(exchange='logs',type='fanout')
+                    
+                    res = channel.queue_declare(exclusive=True,durable=True)
+                    
+                    q_name = res.method.queue
+                    
+                    
+                    channel.queue_bind(exchange='logs',
+                                       queue=q_name)
+                    
+                    print('waiting for messages to exit press ctrl+c')
+                    
+                    def callback(ch,method,properties,body):
+                        # print('ch->',ch+'\n'
+                        #       +'method-->',method +'\n'
+                        #       +'properties-->',properties)
+                        print('Received %s'% body)
+                    
+                    
+                    # channel.basic_qos(prefetch_count=1)#只要还有一条信息没有处理完，就不接收
+                    channel.basic_consume(callback,
+                                        queue=q_name,)
+                                        # no_ack=True)
+                    
+                    
+                    channel.start_consuming()
+    +   direct
             
-                import pika
-                
-                credentials = pika.PlainCredentials('walker','123456')
-                connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',credentials=credentials))
-                channel = connection.channel()
-                channel.exchange_declare(exchange='logs',
-                type='fanout')
-                
-                result = channel.queue_declare(exclusive=True) #不指定queue名字,rabbit会随机分配一个名字,exclusive=True会在使用此queue的消费者断开后,自动将queue删除
-                queue_name = result.method.queue
-                
-                channel.queue_bind(exchange='logs',
-                queue=queue_name)
-                
-                print(' [*] Waiting for logs. To exit press CTRL+C')
-                
-                def callback(ch, method, properties, body):
-                print(" [x] %r" % body)
-                
-                channel.basic_consume(callback,
-                queue=queue_name,
-                no_ack=True)
-                channel.start_consuming()
+            direct类型的Exchange路由规则也很简单，它会把消息路由到那些binding key与routing key完全匹配的Queue中。
+           ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-08.png)
+            
+            以上图的配置为例，我们以routingKey=”error”发送消息到Exchange，则消息会路由到Queue1（amqp.gen-S9b…，
+            这是由RabbitMQ自动生成的Queue名称）和Queue2（amqp.gen-Agl…）；如果我们以routingKey=”info”或
+            routingKey=”warning”来发送消息，则消息只会路由到Queue2。如果我们以其他routingKey发送消息，
+            则消息不会路由到这两个Queue中。
+        +   例子:
+            +   生产者:
+                    
+                    import pika,sys
+
+                    credentials = pika.PlainCredentials('walker','123456')
+                    
+                    connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',
+                    credentials=credentials))
+                    
+                    channel = connection.channel()
+                    
+                    channel.exchange_declare(exchange='testlog',
+                                            type='direct')
+                    
+                    severity = sys.argv[1] if len(sys.argv) >1 else 'info'
+                    
+                    msg = ''.join(sys.argv[2:]) or "Hello World!"
+                    
+                    
+                    #声明queue
+                    # channel.queue_declare(queue='20161226',durable=True)#durable queue会在，内容会丢
+                    
+                    channel.basic_publish(exchange='testlog',
+                                          routing_key =severity,
+                                          # properties = pika.BasicProperties(
+                                          #     delivery_mode=2, #消息持久化
+                                          # ),
+                                          body=msg)
+                    
+                    print('[x] sent %s  %s'% (severity,msg))
+                    connection.close()
+            +   消费者:
+                    
+                    import pika,sys
+
+                    credentials = pika.PlainCredentials('walker','123456')
+                    connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',
+                    credentials=credentials))
+                    
+                    channel = connection.channel()
+                    
+                    channel.exchange_declare(exchange='testlog',type='direct')
+                    
+                    res = channel.queue_declare(exclusive=True)
+                    
+                    q_name = res.method.queue
+                    
+                    severities = sys.argv[1:]
+                    
+                    if not severities:
+                        print('Usage:%s [info] [warning] [error] \n'% sys.argv[0])
+                        exit(1)
+                    for severity in severities:
+                        channel.queue_bind(exchange='testlog',
+                                           queue=q_name,
+                                           routing_key=severity)
+                    
+                    print('waiting for messages to exit press ctrl+c')
+                    
+                    def callback(ch,method,properties,body):
+                        # print('ch->',ch+'\n'
+                        #       +'method-->',method +'\n'
+                        #       +'properties-->',properties)
+                        print('xxxxxx')
+                        print('Received %s'% body)
+                    
+                    
+                    # channel.basic_qos(prefetch_count=1)#只要还有一条信息没有处理完，就不接收
+                    channel.basic_consume(callback,
+                                        queue=q_name)
+                                        # no_ack=True)
+                    
+                    
+                    channel.start_consuming()
+    +   topic
+            
+            前面讲到direct类型的Exchange路由规则是完全匹配binding key与routing key，
+            但这种严格的匹配方式在很多情况下不能满足实际业务需求。topic类型的Exchange在
+            匹配规则上进行了扩展，它与direct类型的Exchage相似，也是将消息路由到binding
+            key与routing key相匹配的Queue中，但这里的匹配规则有些不同，它约定：
+            routing key为一个句点号“. ”分隔的字符串（我们将被句点号“. ”分隔开的每一段
+            独立的字符串称为一个单词），如“stock.usd.nyse”、“nyse.vmw”、“quick.orange.rabbit”
+            binding key与routing key一样也是句点号“. ”分隔的字符串.
+            binding key中可以存在两种特殊字符“*”与“#”，用于做模糊匹配，其中“*”用于匹配一个单词，
+            “#”用于匹配多个单词（可以是零个）.
+           ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-09.png)
+            
+            以上图中的配置为例，routingKey=”quick.orange.rabbit”的消息会同时路由到Q1与Q2，
+            routingKey=”lazy.orange.fox”的消息会路由到Q1，routingKey=”lazy.brown.fox”
+            的消息会路由到Q2，routingKey=”lazy.pink.rabbit”的消息会路由到Q2（只会投递给Q2一次，
+            虽然这个routingKey与Q2的两个bindingKey都匹配）；routingKey=”quick.brown.fox”、
+            routingKey=”orange”、routingKey=”quick.orange.male.rabbit”的消息将会被丢弃，
+            因为它们没有匹配任何bindingKey。
+        +   例子:
+            +   生产者:
+                    
+                    import pika,sys
+                    credentials = pika.PlainCredentials('walker','123456')
+                    
+                    connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',
+                    credentials=credentials))
+                    
+                    channel = connection.channel()
+                    
+                    channel.exchange_declare(exchange='topic_logs',
+                                            type='topic')
+                    
+                    severity = sys.argv[1] if len(sys.argv) >1 else 'anonymous.info'
+                    
+                    msg = ''.join(sys.argv[2:]) or "Hello World!"
+                    
+                    
+                    #声明queue
+                    # channel.queue_declare(queue='20161226',durable=True)#durable queue会在，内容会丢
+                    
+                    channel.basic_publish(exchange='topic_logs',
+                                          routing_key =severity,
+                                          # properties = pika.BasicProperties(
+                                          #     delivery_mode=2, #消息持久化
+                                          # ),
+                                          body=msg)
+                    
+                    print('[x] sent %s  %s'% (severity,msg))
+                    connection.close()
+            +   消费者:
+                    
+                    import pika,sys
+
+                    credentials = pika.PlainCredentials('walker','123456')
+                    connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1',
+                    credentials=credentials))
+                    
+                    channel = connection.channel()
+                    
+                    channel.exchange_declare(exchange='topic_logs',type='topic')
+                    
+                    res = channel.queue_declare(exclusive=True)
+                    
+                    q_name = res.method.queue
+                    
+                    severities = sys.argv[1:]
+                    
+                    if not severities:
+                        print('Usage:%s [bindingg_key] \n'% sys.argv[0])
+                        exit(1)
+                    for severity in severities:
+                        channel.queue_bind(exchange='topic_logs',
+                                           queue=q_name,
+                                           routing_key=severity)
+                    
+                    print('waiting for messages to exit press ctrl+c')
+                    
+                    def callback(ch,method,properties,body):
+                        # print('ch->',ch+'\n'
+                        #       +'method-->',method +'\n'
+                        #       +'properties-->',properties)
+                        # print('xxxxxx')
+                        print('Received %s'% body)
+                    
+                    
+                    # channel.basic_qos(prefetch_count=1)#只要还有一条信息没有处理完，就不接收
+                    channel.basic_consume(callback,
+                                        queue=q_name)
+                                        # no_ack=True)
+                    
+                    
+                    channel.start_consuming()
+                    
++   RPC
+        
+        MQ本身是基于异步的消息处理，前面的示例中所有的生产者（P）将消息发送到RabbitMQ后不会知道消费者（C）
+        处理成功或者失败（甚至连有没有消费者来处理这条消息都不知道）。但实际的应用场景中，我们很可能需要一些
+        同步处理，需要同步等待服务端将我的消息处理完成后再进行下一步处理。这相当于RPC（Remote Procedure Call，远程过程调用）。
+        在RabbitMQ中也支持RPC。
+       ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-10.png)
+        
+        RabbitMQ中实现RPC的机制是：
+        客户端发送请求（消息）时，在消息的属性（MessageProperties，在AMQP协议中定义了14中properties，这些属性会随着消息一起发送）中
+        设置两个值replyTo（一个Queue名称，用于告诉服务器处理完成后将通知我的消息发送到这个Queue中）和correlationId（此次请求的标识号，
+        服务器处理完成后需要将此属性返还，客户端将根据这个id了解哪条请求被成功执行了或执行失败）
+        服务器端收到消息并处理
+        服务器端处理完消息后，将生成一条应答消息到replyTo指定的Queue，同时带上correlationId属性
+        客户端之前已订阅replyTo指定的Queue，从中收到服务器的应答消息后，根据其中的correlationId属性分析哪条请求被执行了，根据执行结果进行后续业务处理.
+        例子见作业...
