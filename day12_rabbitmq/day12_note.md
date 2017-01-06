@@ -31,4 +31,5 @@
 +   Queue
                 
         Queue（队列）是RabbitMQ的内部对象，用于存储消息，用下图表示
-        ![alt text](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-01.png)
+        
+      ![image](https://github.com/jijianming/py15_homework/blob/master/my_pictures/day12-01.png)
